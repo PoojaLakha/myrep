@@ -47,13 +47,18 @@ def Display():
 
 	Name = input("\nEnter Contact Name: ")
 
+	print(Name)
+
 	for cont in contact.select().where(contact.name == Name):
-		print(cont.name, cont.number)
+		print(cont.number)
 
 def DisplayAll():
 	
-	for cont in contact.select():
-		print(cont.name, cont.number)
+	for cont in contact.select(contact.name).distinct():
+		print(cont.name+":")
+		for num in contact.select().where(contact.name == cont.name):
+			print(num.number)
+		print("")
 
 db = SqliteDatabase('contacts.db')
 
