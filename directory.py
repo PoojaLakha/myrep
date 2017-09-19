@@ -1,5 +1,11 @@
-from collections import defaultdict
-import json
+from peewee import *
+
+def initialize_db():
+	db.connect()
+	try:
+		db.create_table(contact)
+	except OperationalError:
+		print("Contact table already exists!")
 
 def GetOption():
 	print()
@@ -11,44 +17,55 @@ def GetOption():
 	return input("\nPlease enter your choice: ")
 
 def DoAddUpdate():
-	name = input("\nEnter Contact Name: ")
-	number = input("Enter Contact Number: ")
 
-	if name in cont_list:
-		cont_list[name].append(number)
-		print("Contact is updated")
+	Name = input("\nEnter Contact Name: ")
+	Number = input("Enter Contact Number: ")
+
+	cont = contact.select().where(contact.name == Name and contact.number == Number).first()
+
+	if not cont:
+		cont = contact(name=Name, number=int(Number))
+		cont.save()
+		print("Contact added successfully")
 	else:
-		cont_list[name] = [name]
-		cont_list[name] = [number]
-		print("Contact is added")
-
+		print("Name and number already exist")
 
 def DoDelete():
-	name = input("\nEnter Contact Name: ")
+	Name = input("\nEnter Contact Name: ")
+	Number = input("Enter Contact Number: ")
 
-	if name in cont_list:
-		del cont_list[name]
-		print("Contact is deleted")
+	del_cont = contact.select().where(contact.name==Name and contact.number==Number).first()
+
+	if not del_cont:
+		print("Name and(or) number does not exist, check again(using option 3 or 4)")
 	else:
-		print("Contact does not exist to delete")
+		contact.get(contact.name==Name and contact.number==Number)
+		del_cont.delete_instance()
+		print("Contact deleted successfully")
 
 def Display():
-	name = input("\nEnter Contact Name: ")
 
-	if name in cont_list:
-		print(name,cont_list[name])
-	else:
-		print("Contact not in list to display")
+	Name = input("\nEnter Contact Name: ")
+
+	for cont in contact.select().where(contact.name == Name):
+		print(cont.name, cont.number)
 
 def DisplayAll():
-	for contact in cont_list:
-		print(contact,cont_list[contact])	
+	
+	for cont in contact.select():
+		print(cont.name, cont.number)
 
-cont_list = defaultdict(list)
-#cont_list = {'pooja': [9999999999],'lakha':[8888888888]}
+db = SqliteDatabase('contacts.db')
 
-with open('contacts.json', 'r') as f:
-	cont_list = json.load(f)
+class contact(Model):
+    name = CharField()
+    number = IntegerField()
+    class Meta:
+    	database = db 
+
+initialize_db()
+#cont = contact.create(name = "pooja", number = 9696969696)
+#cont.save()
 
 Option = GetOption()
 
@@ -64,7 +81,5 @@ while not Option == "5":
 	elif Option not in['1','2','3','4','5']:
 		print("Enter options only between 1 to 5")
 	Option = GetOption()
-
-if Option == '5':
-	with open('contacts.json', 'w') as f:
-		    f.write(json.dumps(cont_list))
+ 
+db.close()
