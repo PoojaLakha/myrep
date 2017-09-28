@@ -44,9 +44,9 @@ if __name__ == '__main__':
 
             iname = input("\nEnter Contact Name: ")
 
-            contact_number, display_status = display(iname)
+            contact_number = display(iname)
 
-            if not display_status:
+            if not contact_number:
                 print("No contact to display")
             else:
                 for number in contact_number:
