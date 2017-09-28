@@ -66,15 +66,13 @@ def do_delete(iname):
 def display(iname):
 
     contact_list = []
-    contact_present = False
 
     for display_contact in ContactNumber.select().where(
             ContactNumber.name == iname):
         if display_contact:
-            contact_present = True
             contact_list.append(display_contact.number)
 
-    return contact_list, contact_present
+    return contact_list
 
 
 def display_all():
