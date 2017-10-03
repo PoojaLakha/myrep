@@ -1,33 +1,37 @@
-from peewee import (CharField, IntegerField, Model, TextField, SqliteDatabase,
+from peewee import (Model, SqliteDatabase, TextField, CharField, IntegerField,
                     ForeignKeyField, TimestampField, DoubleField)
 
-db = SqliteDatabase('Goodreads.db')
+DB = SqliteDatabase('Goodreads.db')
 
 
 class User(Model):
-    email_id = IntegerField(unique=True)
-    email = TextField()
+    email = TextField(unique=True)
     password = CharField()
-
-
-class UserDetail(Model):
-    user_id = IntegerField()
     user_name = CharField()
-    email = ForeignKeyField(User)
     details = TextField()
 
 
 class Book(Model):
-    isbn_number = IntegerField(unique=True)
-    book_id = IntegerField()
-    book_name = CharField()
+    book_id = IntegerField(unique=True)
+    book_title = CharField()
 
 
 class Author(Model):
-    isbn_number = ForeignKeyField(Book)
-    author_id = IntegerField()
+    author_id = IntegerField(unique=True)
     author_name = CharField()
+
+
+class BookAuthor(Model):
+    book_id = ForeignKeyField(Book)
+    author_id = ForeignKeyField(Author)
     genre = CharField()
+
+
+class User_Book_Review(Model):
+    user = ForeignKeyField(User)
+    book = ForeignKeyField(Book)
+    rating = DoubleField()
+    comment = TextField()
 
 
 class Message(Model):
@@ -36,17 +40,3 @@ class Message(Model):
     subject = TextField()
     message = TextField()
     timestamp = TimestampField()
-
-
-class Comment(Model):
-    book_id = ForeignKeyField(Book)
-    user_id = ForeignKeyField(User)
-    comment_id = IntegerField()
-    comment = TextField()
-    likes = IntegerField()
-
-
-class Book_Rating(Model):
-    user_id = ForeignKeyField(User)
-    book_id = ForeignKeyField(Book)
-    rating = DoubleField()
